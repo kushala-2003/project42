@@ -88,6 +88,76 @@ li:last-child {
     display: flex;
     gap: 10px;
 }
+document.addEventListener('DOMContentLoaded', function() {
+    const taskForm = document.getElementById('taskForm');
+    const taskInput = document.getElementById('taskInput');
+    const taskList = document.getElementById('taskList');
+
+    // Load tasks from local storage
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+    // Function to display tasks
+    function displayTasks() {
+        taskList.innerHTML = '';
+        tasks.forEach((task, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span class="${task.completed ? 'completed' : ''}">${task.name}</span>
+                <span>
+                    <button class="edit-btn">Edit</button>
+                    <button class="delete-btn">Delete</button>
+                </span>
+            `;
+            li.querySelector('.edit-btn').addEventListener('click', () => editTask(index));
+            li.querySelector('.delete-btn').addEventListener('click', () => deleteTask(index));
+            li.querySelector('span:first-child').addEventListener('click', () => toggleTask(index));
+            taskList.appendChild(li);
+        });
+    }
+
+    // Function to add a new task
+    taskForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const taskName = taskInput.value.trim();
+        if (taskName === '') return;
+        const newTask = {
+            name: taskName,
+            completed: false
+        };
+        tasks.push(newTask);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        displayTasks();
+        taskInput.value = '';
+    });
+
+    // Function to edit a task
+    function editTask(index) {
+        const newName = prompt('Edit the task:', tasks[index].name);
+        if (newName !== null) {
+            tasks[index].name = newName.trim();
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            displayTasks();
+        }
+    }
+
+    // Function to delete a task
+    function deleteTask(index) {
+        tasks.splice(index, 1);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        displayTasks();
+    }
+
+    // Function to toggle task completion
+    function toggleTask(index) {
+        tasks[index].completed = !tasks[index].completed;
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        displayTasks();
+    }
+
+    // Display tasks initially
+    displayTasks();
+});
+
 
 
 
